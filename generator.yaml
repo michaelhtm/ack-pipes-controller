@@ -1,0 +1,5 @@
+ignore:
+  resource_names:
+  - Pipe
+sdk_names:
+  model: pipes
