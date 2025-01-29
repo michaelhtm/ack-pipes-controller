@@ -52,6 +52,10 @@ type PipeSpec struct {
 	// +kubebuilder:validation:Required
 	Target *string `json:"target"`
 	// The parameters required to set up a target for your pipe.
+	//
+	// For more information about pipe target parameters, including how to use dynamic
+	// path parameters, see Target parameters (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html)
+	// in the Amazon EventBridge User Guide.
 	TargetParameters *PipeTargetParameters `json:"targetParameters,omitempty"`
 }
 
