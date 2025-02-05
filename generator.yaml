@@ -1,6 +1,10 @@
 ignore:
   resource_names:
       # - Pipe
+  field_paths:
+  - CreatePipeInput.KmsKeyIdentifier
+  - CreatePipeInput.LogConfiguration
+  - PipeTargetParameters.TimestreamParameters
 sdk_names:
   client_struct: Pipes
   client_interface: PipesAPI

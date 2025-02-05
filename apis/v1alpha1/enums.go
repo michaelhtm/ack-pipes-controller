@@ -37,6 +37,12 @@ const (
 	BatchResourceRequirementType_VCPU   BatchResourceRequirementType = "VCPU"
 )
 
+type DimensionValueType string
+
+const (
+	DimensionValueType_VARCHAR DimensionValueType = "VARCHAR"
+)
+
 type DynamoDBStreamStartPosition string
 
 const (
@@ -57,6 +63,21 @@ const (
 	ECSResourceRequirementType_InferenceAccelerator ECSResourceRequirementType = "InferenceAccelerator"
 )
 
+type EpochTimeUnit string
+
+const (
+	EpochTimeUnit_MILLISECONDS EpochTimeUnit = "MILLISECONDS"
+	EpochTimeUnit_SECONDS      EpochTimeUnit = "SECONDS"
+	EpochTimeUnit_MICROSECONDS EpochTimeUnit = "MICROSECONDS"
+	EpochTimeUnit_NANOSECONDS  EpochTimeUnit = "NANOSECONDS"
+)
+
+type IncludeExecutionDataOption string
+
+const (
+	IncludeExecutionDataOption_ALL IncludeExecutionDataOption = "ALL"
+)
+
 type KinesisStreamStartPosition string
 
 const (
@@ -73,11 +94,30 @@ const (
 	LaunchType_EXTERNAL LaunchType = "EXTERNAL"
 )
 
+type LogLevel string
+
+const (
+	LogLevel_OFF   LogLevel = "OFF"
+	LogLevel_ERROR LogLevel = "ERROR"
+	LogLevel_INFO  LogLevel = "INFO"
+	LogLevel_TRACE LogLevel = "TRACE"
+)
+
 type MSKStartPosition string
 
 const (
 	MSKStartPosition_TRIM_HORIZON MSKStartPosition = "TRIM_HORIZON"
 	MSKStartPosition_LATEST       MSKStartPosition = "LATEST"
+)
+
+type MeasureValueType string
+
+const (
+	MeasureValueType_DOUBLE    MeasureValueType = "DOUBLE"
+	MeasureValueType_BIGINT    MeasureValueType = "BIGINT"
+	MeasureValueType_VARCHAR   MeasureValueType = "VARCHAR"
+	MeasureValueType_BOOLEAN   MeasureValueType = "BOOLEAN"
+	MeasureValueType_TIMESTAMP MeasureValueType = "TIMESTAMP"
 )
 
 type OnPartialBatchItemFailureStreams string
@@ -89,17 +129,21 @@ const (
 type PipeState string
 
 const (
-	PipeState_RUNNING       PipeState = "RUNNING"
-	PipeState_STOPPED       PipeState = "STOPPED"
-	PipeState_CREATING      PipeState = "CREATING"
-	PipeState_UPDATING      PipeState = "UPDATING"
-	PipeState_DELETING      PipeState = "DELETING"
-	PipeState_STARTING      PipeState = "STARTING"
-	PipeState_STOPPING      PipeState = "STOPPING"
-	PipeState_CREATE_FAILED PipeState = "CREATE_FAILED"
-	PipeState_UPDATE_FAILED PipeState = "UPDATE_FAILED"
-	PipeState_START_FAILED  PipeState = "START_FAILED"
-	PipeState_STOP_FAILED   PipeState = "STOP_FAILED"
+	PipeState_RUNNING                PipeState = "RUNNING"
+	PipeState_STOPPED                PipeState = "STOPPED"
+	PipeState_CREATING               PipeState = "CREATING"
+	PipeState_UPDATING               PipeState = "UPDATING"
+	PipeState_DELETING               PipeState = "DELETING"
+	PipeState_STARTING               PipeState = "STARTING"
+	PipeState_STOPPING               PipeState = "STOPPING"
+	PipeState_CREATE_FAILED          PipeState = "CREATE_FAILED"
+	PipeState_UPDATE_FAILED          PipeState = "UPDATE_FAILED"
+	PipeState_START_FAILED           PipeState = "START_FAILED"
+	PipeState_STOP_FAILED            PipeState = "STOP_FAILED"
+	PipeState_DELETE_FAILED          PipeState = "DELETE_FAILED"
+	PipeState_CREATE_ROLLBACK_FAILED PipeState = "CREATE_ROLLBACK_FAILED"
+	PipeState_DELETE_ROLLBACK_FAILED PipeState = "DELETE_ROLLBACK_FAILED"
+	PipeState_UPDATE_ROLLBACK_FAILED PipeState = "UPDATE_ROLLBACK_FAILED"
 )
 
 type PipeTargetInvocationType string
@@ -145,9 +189,24 @@ const (
 	RequestedPipeStateDescribeResponse_DELETED RequestedPipeStateDescribeResponse = "DELETED"
 )
 
+type S3OutputFormat string
+
+const (
+	S3OutputFormat_json  S3OutputFormat = "json"
+	S3OutputFormat_plain S3OutputFormat = "plain"
+	S3OutputFormat_w3c   S3OutputFormat = "w3c"
+)
+
 type SelfManagedKafkaStartPosition string
 
 const (
 	SelfManagedKafkaStartPosition_TRIM_HORIZON SelfManagedKafkaStartPosition = "TRIM_HORIZON"
 	SelfManagedKafkaStartPosition_LATEST       SelfManagedKafkaStartPosition = "LATEST"
+)
+
+type TimeFieldType string
+
+const (
+	TimeFieldType_EPOCH            TimeFieldType = "EPOCH"
+	TimeFieldType_TIMESTAMP_FORMAT TimeFieldType = "TIMESTAMP_FORMAT"
 )

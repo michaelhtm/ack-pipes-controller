@@ -93,6 +93,16 @@ type CapacityProviderStrategyItem struct {
 	Weight           *int64  `json:"weight,omitempty"`
 }
 
+// The Amazon CloudWatch Logs logging configuration settings for the pipe.
+type CloudwatchLogsLogDestination struct {
+	LogGroupARN *string `json:"logGroupARN,omitempty"`
+}
+
+// The Amazon CloudWatch Logs logging configuration settings for the pipe.
+type CloudwatchLogsLogDestinationParameters struct {
+	LogGroupARN *string `json:"logGroupARN,omitempty"`
+}
+
 // A DeadLetterConfig object that contains information about a dead-letter queue
 // configuration.
 type DeadLetterConfig struct {
@@ -209,11 +219,25 @@ type Filter struct {
 	Pattern *string `json:"pattern,omitempty"`
 }
 
-// The collection of event patterns used to filter events. For more information,
-// see Events and Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+// The collection of event patterns used to filter events.
+//
+// To remove a filter, specify a FilterCriteria object with an empty array of
+// Filter objects.
+//
+// For more information, see Events and Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
 // in the Amazon EventBridge User Guide.
 type FilterCriteria struct {
 	Filters []*Filter `json:"filters,omitempty"`
+}
+
+// The Amazon Data Firehose logging configuration settings for the pipe.
+type FirehoseLogDestination struct {
+	DeliveryStreamARN *string `json:"deliveryStreamARN,omitempty"`
+}
+
+// The Amazon Data Firehose logging configuration settings for the pipe.
+type FirehoseLogDestinationParameters struct {
+	DeliveryStreamARN *string `json:"deliveryStreamARN,omitempty"`
 }
 
 // The Secrets Manager secret that stores your broker credentials.
@@ -256,6 +280,47 @@ type PipeEnrichmentParameters struct {
 	// from the Connection taking precedence.
 	HTTPParameters *PipeEnrichmentHTTPParameters `json:"httpParameters,omitempty"`
 	InputTemplate  *string                       `json:"inputTemplate,omitempty"`
+}
+
+// The logging configuration settings for the pipe.
+type PipeLogConfiguration struct {
+	// The Amazon CloudWatch Logs logging configuration settings for the pipe.
+	CloudwatchLogsLogDestination *CloudwatchLogsLogDestination `json:"cloudwatchLogsLogDestination,omitempty"`
+	// The Amazon Data Firehose logging configuration settings for the pipe.
+	FirehoseLogDestination *FirehoseLogDestination `json:"firehoseLogDestination,omitempty"`
+	IncludeExecutionData   []*string               `json:"includeExecutionData,omitempty"`
+	Level                  *string                 `json:"level,omitempty"`
+	// The Amazon S3 logging configuration settings for the pipe.
+	S3LogDestination *S3LogDestination `json:"s3LogDestination,omitempty"`
+}
+
+// Specifies the logging configuration settings for the pipe.
+//
+// When you call UpdatePipe, EventBridge updates the fields in the PipeLogConfigurationParameters
+// object atomically as one and overrides existing values. This is by design.
+// If you don't specify an optional field in any of the Amazon Web Services
+// service parameters objects (CloudwatchLogsLogDestinationParameters, FirehoseLogDestinationParameters,
+// or S3LogDestinationParameters), EventBridge sets that field to its system-default
+// value during the update.
+//
+// For example, suppose when you created the pipe you specified a Firehose stream
+// log destination. You then update the pipe to add an Amazon S3 log destination.
+// In addition to specifying the S3LogDestinationParameters for the new log
+// destination, you must also specify the fields in the FirehoseLogDestinationParameters
+// object in order to retain the Firehose stream log destination.
+//
+// For more information on generating pipe log records, see Log EventBridge
+// Pipes (eventbridge/latest/userguide/eb-pipes-logs.html) in the Amazon EventBridge
+// User Guide.
+type PipeLogConfigurationParameters struct {
+	// The Amazon CloudWatch Logs logging configuration settings for the pipe.
+	CloudwatchLogsLogDestination *CloudwatchLogsLogDestinationParameters `json:"cloudwatchLogsLogDestination,omitempty"`
+	// The Amazon Data Firehose logging configuration settings for the pipe.
+	FirehoseLogDestination *FirehoseLogDestinationParameters `json:"firehoseLogDestination,omitempty"`
+	IncludeExecutionData   []*string                         `json:"includeExecutionData,omitempty"`
+	Level                  *string                           `json:"level,omitempty"`
+	// The Amazon S3 logging configuration settings for the pipe.
+	S3LogDestination *S3LogDestinationParameters `json:"s3LogDestination,omitempty"`
 }
 
 // The parameters for using an Active MQ broker as a source.
@@ -313,8 +378,12 @@ type PipeSourceParameters struct {
 	ActiveMQBrokerParameters *PipeSourceActiveMQBrokerParameters `json:"activeMQBrokerParameters,omitempty"`
 	// The parameters for using a DynamoDB stream as a source.
 	DynamoDBStreamParameters *PipeSourceDynamoDBStreamParameters `json:"dynamoDBStreamParameters,omitempty"`
-	// The collection of event patterns used to filter events. For more information,
-	// see Events and Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+	// The collection of event patterns used to filter events.
+	//
+	// To remove a filter, specify a FilterCriteria object with an empty array of
+	// Filter objects.
+	//
+	// For more information, see Events and Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
 	// in the Amazon EventBridge User Guide.
 	FilterCriteria *FilterCriteria `json:"filterCriteria,omitempty"`
 	// The parameters for using a Kinesis stream as a source.
@@ -324,6 +393,13 @@ type PipeSourceParameters struct {
 	// The parameters for using a Rabbit MQ broker as a source.
 	RabbitMQBrokerParameters *PipeSourceRabbitMQBrokerParameters `json:"rabbitMQBrokerParameters,omitempty"`
 	// The parameters for using a self-managed Apache Kafka stream as a source.
+	//
+	// A self managed cluster refers to any Apache Kafka cluster not hosted by Amazon
+	// Web Services. This includes both clusters you manage yourself, as well as
+	// those hosted by a third-party provider, such as Confluent Cloud (https://www.confluent.io/),
+	// CloudKarafka (https://www.cloudkarafka.com/), or Redpanda (https://redpanda.com/).
+	// For more information, see Apache Kafka streams as a source (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html)
+	// in the Amazon EventBridge User Guide.
 	SelfManagedKafkaParameters *PipeSourceSelfManagedKafkaParameters `json:"selfManagedKafkaParameters,omitempty"`
 	// The parameters for using a Amazon SQS stream as a source.
 	SQSQueueParameters *PipeSourceSQSQueueParameters `json:"sqsQueueParameters,omitempty"`
@@ -346,6 +422,13 @@ type PipeSourceSQSQueueParameters struct {
 }
 
 // The parameters for using a self-managed Apache Kafka stream as a source.
+//
+// A self managed cluster refers to any Apache Kafka cluster not hosted by Amazon
+// Web Services. This includes both clusters you manage yourself, as well as
+// those hosted by a third-party provider, such as Confluent Cloud (https://www.confluent.io/),
+// CloudKarafka (https://www.cloudkarafka.com/), or Redpanda (https://redpanda.com/).
+// For more information, see Apache Kafka streams as a source (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html)
+// in the Amazon EventBridge User Guide.
 type PipeSourceSelfManagedKafkaParameters struct {
 	AdditionalBootstrapServers []*string `json:"additionalBootstrapServers,omitempty"`
 	BatchSize                  *int64    `json:"batchSize,omitempty"`
@@ -425,7 +508,7 @@ type PipeTargetHTTPParameters struct {
 	QueryStringParameters map[string]*string `json:"queryStringParameters,omitempty"`
 }
 
-// The parameters for using a Kinesis stream as a source.
+// The parameters for using a Kinesis stream as a target.
 type PipeTargetKinesisStreamParameters struct {
 	PartitionKey *string `json:"partitionKey,omitempty"`
 }
@@ -436,6 +519,10 @@ type PipeTargetLambdaFunctionParameters struct {
 }
 
 // The parameters required to set up a target for your pipe.
+//
+// For more information about pipe target parameters, including how to use dynamic
+// path parameters, see Target parameters (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-event-target.html)
+// in the Amazon EventBridge User Guide.
 type PipeTargetParameters struct {
 	// The parameters for using an Batch job as a target.
 	BatchJobParameters *PipeTargetBatchJobParameters `json:"batchJobParameters,omitempty"`
@@ -449,23 +536,23 @@ type PipeTargetParameters struct {
 	// APIs or EventBridge ApiDestinations.
 	HTTPParameters *PipeTargetHTTPParameters `json:"httpParameters,omitempty"`
 	InputTemplate  *string                   `json:"inputTemplate,omitempty"`
-	// The parameters for using a Kinesis stream as a source.
+	// The parameters for using a Kinesis stream as a target.
 	KinesisStreamParameters *PipeTargetKinesisStreamParameters `json:"kinesisStreamParameters,omitempty"`
 	// The parameters for using a Lambda function as a target.
 	LambdaFunctionParameters *PipeTargetLambdaFunctionParameters `json:"lambdaFunctionParameters,omitempty"`
 	// These are custom parameters to be used when the target is a Amazon Redshift
-	// cluster to invoke the Amazon Redshift Data API ExecuteStatement.
+	// cluster to invoke the Amazon Redshift Data API BatchExecuteStatement.
 	RedshiftDataParameters *PipeTargetRedshiftDataParameters `json:"redshiftDataParameters,omitempty"`
 	// The parameters for using a SageMaker pipeline as a target.
 	SageMakerPipelineParameters *PipeTargetSageMakerPipelineParameters `json:"sageMakerPipelineParameters,omitempty"`
-	// The parameters for using a Amazon SQS stream as a source.
+	// The parameters for using a Amazon SQS stream as a target.
 	SQSQueueParameters *PipeTargetSQSQueueParameters `json:"sqsQueueParameters,omitempty"`
 	// The parameters for using a Step Functions state machine as a target.
 	StepFunctionStateMachineParameters *PipeTargetStateMachineParameters `json:"stepFunctionStateMachineParameters,omitempty"`
 }
 
 // These are custom parameters to be used when the target is a Amazon Redshift
-// cluster to invoke the Amazon Redshift Data API ExecuteStatement.
+// cluster to invoke the Amazon Redshift Data API BatchExecuteStatement.
 type PipeTargetRedshiftDataParameters struct {
 	// // Redshift Database
 	Database *string `json:"database,omitempty"`
@@ -475,13 +562,13 @@ type PipeTargetRedshiftDataParameters struct {
 	SecretManagerARN *string `json:"secretManagerARN,omitempty"`
 	// // A list of SQLs.
 	SQLs []*string `json:"sqls,omitempty"`
-	// // A name for Redshift DataAPI statement which can be used as filter of //
+	// // A name for Redshift DataAPI statement which can be used as filter of//
 	// ListStatement.
 	StatementName *string `json:"statementName,omitempty"`
 	WithEvent     *bool   `json:"withEvent,omitempty"`
 }
 
-// The parameters for using a Amazon SQS stream as a source.
+// The parameters for using a Amazon SQS stream as a target.
 type PipeTargetSQSQueueParameters struct {
 	MessageDeduplicationID *string `json:"messageDeduplicationID,omitempty"`
 	MessageGroupID         *string `json:"messageGroupID,omitempty"`
@@ -527,6 +614,22 @@ type PlacementConstraint struct {
 type PlacementStrategy struct {
 	Field *string `json:"field,omitempty"`
 	Type  *string `json:"type_,omitempty"`
+}
+
+// The Amazon S3 logging configuration settings for the pipe.
+type S3LogDestination struct {
+	BucketName   *string `json:"bucketName,omitempty"`
+	BucketOwner  *string `json:"bucketOwner,omitempty"`
+	OutputFormat *string `json:"outputFormat,omitempty"`
+	Prefix       *string `json:"prefix,omitempty"`
+}
+
+// The Amazon S3 logging configuration settings for the pipe.
+type S3LogDestinationParameters struct {
+	BucketName   *string `json:"bucketName,omitempty"`
+	BucketOwner  *string `json:"bucketOwner,omitempty"`
+	OutputFormat *string `json:"outputFormat,omitempty"`
+	Prefix       *string `json:"prefix,omitempty"`
 }
 
 // Name/Value pair of a parameter to start execution of a SageMaker Model Building
@@ -612,8 +715,12 @@ type UpdatePipeSourceParameters struct {
 	ActiveMQBrokerParameters *UpdatePipeSourceActiveMQBrokerParameters `json:"activeMQBrokerParameters,omitempty"`
 	// The parameters for using a DynamoDB stream as a source.
 	DynamoDBStreamParameters *UpdatePipeSourceDynamoDBStreamParameters `json:"dynamoDBStreamParameters,omitempty"`
-	// The collection of event patterns used to filter events. For more information,
-	// see Events and Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
+	// The collection of event patterns used to filter events.
+	//
+	// To remove a filter, specify a FilterCriteria object with an empty array of
+	// Filter objects.
+	//
+	// For more information, see Events and Event Patterns (https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html)
 	// in the Amazon EventBridge User Guide.
 	FilterCriteria *FilterCriteria `json:"filterCriteria,omitempty"`
 	// The parameters for using a Kinesis stream as a source.
@@ -623,6 +730,13 @@ type UpdatePipeSourceParameters struct {
 	// The parameters for using a Rabbit MQ broker as a source.
 	RabbitMQBrokerParameters *UpdatePipeSourceRabbitMQBrokerParameters `json:"rabbitMQBrokerParameters,omitempty"`
 	// The parameters for using a self-managed Apache Kafka stream as a source.
+	//
+	// A self managed cluster refers to any Apache Kafka cluster not hosted by Amazon
+	// Web Services. This includes both clusters you manage yourself, as well as
+	// those hosted by a third-party provider, such as Confluent Cloud (https://www.confluent.io/),
+	// CloudKarafka (https://www.cloudkarafka.com/), or Redpanda (https://redpanda.com/).
+	// For more information, see Apache Kafka streams as a source (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html)
+	// in the Amazon EventBridge User Guide.
 	SelfManagedKafkaParameters *UpdatePipeSourceSelfManagedKafkaParameters `json:"selfManagedKafkaParameters,omitempty"`
 	// The parameters for using a Amazon SQS stream as a source.
 	SQSQueueParameters *UpdatePipeSourceSQSQueueParameters `json:"sqsQueueParameters,omitempty"`
@@ -643,6 +757,13 @@ type UpdatePipeSourceSQSQueueParameters struct {
 }
 
 // The parameters for using a self-managed Apache Kafka stream as a source.
+//
+// A self managed cluster refers to any Apache Kafka cluster not hosted by Amazon
+// Web Services. This includes both clusters you manage yourself, as well as
+// those hosted by a third-party provider, such as Confluent Cloud (https://www.confluent.io/),
+// CloudKarafka (https://www.cloudkarafka.com/), or Redpanda (https://redpanda.com/).
+// For more information, see Apache Kafka streams as a source (https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-pipes-kafka.html)
+// in the Amazon EventBridge User Guide.
 type UpdatePipeSourceSelfManagedKafkaParameters struct {
 	BatchSize *int64 `json:"batchSize,omitempty"`
 	// The Secrets Manager secret that stores your stream credentials.

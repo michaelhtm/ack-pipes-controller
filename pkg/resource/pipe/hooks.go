@@ -20,7 +20,8 @@ import (
 
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
-	svcsdk "github.com/aws/aws-sdk-go/service/pipes"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/pipes"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/pipes/types"
 
 	svcapitypes "github.com/aws-controllers-k8s/pipes-controller/apis/v1alpha1"
 )
@@ -43,17 +44,17 @@ const (
 
 var (
 	requeueWaitWhileCreating = ackrequeue.NeededAfter(
-		fmt.Errorf("pipe in status %q, requeueing", svcsdk.PipeStateCreating),
+		fmt.Errorf("pipe in status %q, requeueing", svcsdktypes.PipeStateCreating),
 		defaultRequeueDelay,
 	)
 
 	requeueWaitWhileUpdating = ackrequeue.NeededAfter(
-		fmt.Errorf("pipe in status %q, cannot be modified or deleted", svcsdk.PipeStateUpdating),
+		fmt.Errorf("pipe in status %q, cannot be modified or deleted", svcsdktypes.PipeStateUpdating),
 		defaultRequeueDelay,
 	)
 
 	requeueWaitWhileDeleting = ackrequeue.NeededAfter(
-		fmt.Errorf("pipe in status %q, cannot be modified or deleted", svcsdk.PipeStateDeleting),
+		fmt.Errorf("pipe in status %q, cannot be modified or deleted", svcsdktypes.PipeStateDeleting),
 		defaultRequeueDelay,
 	)
 )
@@ -104,8 +105,8 @@ func customPreCompare(
 	bDesiredState := b.ko.Spec.DesiredState
 
 	// assumes API always returns desiredState
-	running := aDesiredState == nil || *aDesiredState == "" || *aDesiredState == svcsdk.PipeStateRunning
-	if !(running && *bDesiredState == svcsdk.PipeStateRunning) {
+	running := aDesiredState == nil || *aDesiredState == "" || *aDesiredState == string(svcsdktypes.PipeStateRunning)
+	if !(running && *bDesiredState == string(svcsdktypes.PipeStateRunning)) {
 		if *aDesiredState != *bDesiredState {
 			delta.Add("Spec.DesiredState", aDesiredState, bDesiredState)
 		}
@@ -954,7 +955,7 @@ func pipeAvailable(r *resource) bool {
 		return false
 	}
 	state := *r.ko.Status.CurrentState
-	return state == svcsdk.PipeStateRunning
+	return state == string(svcsdktypes.PipeStateRunning)
 }
 
 // pipeInMutatingState returns true if the supplied Pipe is in the process of
@@ -966,11 +967,11 @@ func pipeInMutatingState(r *resource) bool {
 	state := *r.ko.Status.CurrentState
 
 	mutatingStates := []string{
-		svcsdk.PipeStateCreating,
-		svcsdk.PipeStateStarting,
-		svcsdk.PipeStateStopping,
-		svcsdk.PipeStateUpdating,
-		svcsdk.PipeStateDeleting,
+		string(svcsdktypes.PipeStateCreating),
+		string(svcsdktypes.PipeStateStarting),
+		string(svcsdktypes.PipeStateStopping),
+		string(svcsdktypes.PipeStateUpdating),
+		string(svcsdktypes.PipeStateDeleting),
 	}
 
 	for _, s := range mutatingStates {
@@ -990,13 +991,14 @@ func unsetRemovedSpecFields(
 ) {
 	if delta.DifferentAt("Spec.Description") {
 		if spec.Description == nil {
-			input.SetDescription("")
+			descriptionCopy := ""
+			input.Description = &descriptionCopy
 		}
 	}
 
 	if delta.DifferentAt("Spec.DesiredState") {
 		if spec.DesiredState == nil {
-			input.SetDesiredState("")
+			input.DesiredState = ""
 		}
 	}
 }

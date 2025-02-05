@@ -17,7 +17,7 @@ import (
 	"context"
 
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	svcsdk "github.com/aws/aws-sdk-go/service/pipes"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/pipes"
 )
 
 // updatePipeTags uses TagResource and UntagResource to add, remove and update
@@ -39,7 +39,7 @@ func (rm *resourceManager) updatePipeTags(
 			ResourceArn: (*string)(desired.ko.Status.ACKResourceMetadata.ARN),
 			TagKeys:     removed,
 		}
-		_, err = rm.sdkapi.UntagResourceWithContext(ctx, input)
+		_, err = rm.sdkapi.UntagResource(ctx, input)
 		rm.metrics.RecordAPICall("UPDATE", "UntagResource", err)
 		if err != nil {
 			return err
@@ -51,7 +51,7 @@ func (rm *resourceManager) updatePipeTags(
 			ResourceArn: (*string)(desired.ko.Status.ACKResourceMetadata.ARN),
 			Tags:        addedOrUpdated,
 		}
-		_, err = rm.sdkapi.TagResourceWithContext(ctx, input)
+		_, err = rm.sdkapi.TagResource(ctx, input)
 		rm.metrics.RecordAPICall("UPDATE", "TagResource", err)
 		if err != nil {
 			return err
@@ -67,24 +67,24 @@ func (rm *resourceManager) updatePipeTags(
 func compareMaps(
 	a map[string]*string,
 	b map[string]*string,
-) (addedOrUpdated map[string]*string, removed []*string) {
-	addedOrUpdated = make(map[string]*string)
+) (addedOrUpdated map[string]string, removed []string) {
+	addedOrUpdated = make(map[string]string)
 	visited := make(map[string]bool, len(a))
 	for keyA, valueA := range a {
 		valueB, found := b[keyA]
 		if !found {
-			removed = append(removed, &keyA)
+			removed = append(removed, keyA)
 			continue
 		}
 		if *valueA != *valueB {
-			addedOrUpdated[keyA] = valueB
+			addedOrUpdated[keyA] = *valueB
 		}
 		visited[keyA] = true
 	}
 	for keyB, valueB := range b {
 		_, found := a[keyB]
 		if !found {
-			addedOrUpdated[keyB] = valueB
+			addedOrUpdated[keyB] = *valueB
 		}
 	}
 	return
